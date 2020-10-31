@@ -1,0 +1,135 @@
+;;Yusheng Liu
+;;Oct 26
+;;AUCSC 370
+;;the Rock, Paper, Scissors game. This is a two player game, with the user being one 
+;;of the players and the computer being the other player.
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; readLine() --> line (as String)
+;; author: Rosanna Heise
+;; Read one line from standard input, not including the newline
+;; but eliminating it. This is wrapper for the recursive method
+;; that does the work (readLoop).
+;;
+(define (readLine)
+(readLoop (read-char (current-input-port)) '())) ;do wait for one char
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; readLoop(currentCharacter line) --> line (as String)
+;; author: Rosanna Heise
+;; This recursive method reads a character at a time from the
+;; current input port (assuming Scheme's "Interaction Window")
+;; until it finds the newline (i.e. enter). It builds the characters
+;; into a string which is returned at the end. Newline is not part
+;; of the string, but is eliminated from the input
+;;
+(define (readLoop curChar line)
+(cond
+((char=? #\newline curChar) (list->string line))
+(else (readLoop (read-char (current-input-port))
+(append line (list curChar))))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; takeFirstChar()
+;; ask for a input from user change it into a list and return the first element
+(define (takeFirstChar)
+  (display "Please enter your choice: \"Rock\", \"Paper\", or \"Scissors\":   ")
+  (car(string->list(readline))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; readFirstLetter(char aChar)
+;; compare the char to determine the users' input
+;; return 0 for rock, 1 for paper and 2 for scissors
+(define (readFirstLetter aChar)
+  (cond
+    ((or (eq? #\R aChar) (eq? #\r aChar))
+       (display "You entered Rock")0)
+    ((or (eq? #\P aChar) (eq? #\p aChar))
+       (display "You entered PAPER")1)
+    ((or (eq? #\S aChar) (eq? #\s aChar))
+       (display "You entered SCISSORS")2)
+    (else
+      (display "Not sure of your selection. Try again.\n")
+      (readFirstLetter (takeFirstChar))))) ;;use recursion to find correct input
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; randomComputer()
+;; genrate a random int from 0-2 stands for rock paper and scissors
+;; print the line of computers choice and return the int
+(define (randomComputer)
+  (define com (random 3)) ;;genrate a random int
+  (cond
+    ((eq? com 0)
+      (display "   Computer chose ROCK  ")0)
+    ((eq? com 1)
+      (display "   Computer chose PAPER  ")1)
+    (else
+      (display "   Computer chose SCISSORS  ")2)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; findWinner(int player, int computer)
+;; take two integers and compare them to find the winner and print the line
+(define (findWinner player computer)
+  (cond
+    ((eq? player computer)
+       (display "TIE\n\n")0)
+    ((or(eq? player (+ 1 computer))(eq? (+ 2 player) computer))
+       (display "Winner is You\n\n")1)
+    (else
+      (display "Winner is Computer\n\n")100)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; findHundred(int num, int result)
+;; function: num//100
+;; only work on positive numbers
+(define (findHundred num result)
+  (cond
+    ((negative? num) ;;if num < 0
+     (- result 1)) ;;return result-1
+    (else
+      (findHundred (- num 100)(+ 1 result))))) ;;recursion
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; games(int round, point)
+;; main method use recursion to run the game
+(define (games round point)
+  (cond
+    ((eq? round 10) ;; if round == 10 stop recursion
+      (display "Game Over! You won ")
+      (display (- point (* 100 (findHundred point 0))))
+      (display " rounds, computer won ")
+      (display (findHundred point 0))
+      (display " rounds, tied ")
+      (display (- 10 (+ (- point (* 100 (findHundred point 0))) (findHundred point 0))))
+      (display " rounds \nChampion: ")
+      (cond
+        ((eq? (- point (* 100 (findHundred point 0))) (findHundred point 0))
+          (display "NO ONE"))
+        ((negative? (- (- point (* 100 (findHundred point 0))) (findHundred point 0)))
+          (display "COMPUTER"))
+        (else
+          (display "YOU"))))
+    (else
+      (games (+ 1 round) (+ (findWinner (readFirstLetter(takeFirstChar)) (randomComputer)) point)) ;;recursion
+    );;else
+  );;cond
+);;games
+ 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; main function
+;; wrapper of games()
+(define (play)
+  (display "Welcome to ROCK PAPER SCISSORS game\n")
+  (display "-----------------------------------\n\n")
+  (games 0 0))
+        
+        
+        
+        
+        
+        
+        
+        
+       
